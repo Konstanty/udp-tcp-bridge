@@ -28,7 +28,7 @@
 #define MAXBUFLEN 100
 
 pthread_mutex_t mylock;
-std::vector<std::string> pktqueue;
+std::vector<std::vector<unsigned char> > pktqueue;
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -89,7 +89,7 @@ void *TCPserver(void *arg)                    /* servlet thread */
 			while (queuesize > 0 && connected) {
 				pthread_mutex_lock (&mylock);
 				for (int z=0; z<pktqueue.size() && connected; z++) {
-					if (ret = send(new_fd, pktqueue[z].c_str(), pktqueue[z].size(), 0) < 0) {
+					if (ret = send(new_fd, &(pktqueue[z][0]), pktqueue[z].size(), 0) < 0) {
 						if (errno == 32) {
 							fprintf(stderr, "TCP: client disconnected\n");
 						} else {
@@ -183,7 +183,7 @@ int main(void)
 	buf[numbytes] = '\0';
 
 	// put buffer onto queue for all other TCP clients to receive
-	std::string newpkt = std::string(buf, numbytes);
+	std::vector<unsigned char> newpkt((const unsigned char *)buf, (const unsigned char *)buf + numbytes);
 
 	//printf("listener: packet contains \"%s\"\n", newpkt.c_str());
 	pthread_mutex_lock (&mylock);
