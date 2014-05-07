@@ -8,8 +8,8 @@ Listens on UDP port 3333 and TCP port 3000. All data sent to UDP port 3333 will 
 Building
 ==
 
-make
+`make`
 
 Running
 ==
-./udptcpbridge
+`./udptcpbridge`
