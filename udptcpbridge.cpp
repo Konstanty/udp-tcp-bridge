@@ -25,10 +25,11 @@
 #define UDPPORT "3333"    // the port users will be connecting to
 #define TCPPORT 3000
 
-#define MAXBUFLEN 100
+#define MAXBUFLEN 200
 
 pthread_mutex_t mylock;
 std::vector<std::vector<unsigned char> > pktqueue;
+int connected = 0;
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -74,7 +75,7 @@ void *TCPserver(void *arg)                    /* servlet thread */
 		printf("TCP: Waiting for connection (IP:%d)...\n", TCPPORT);
         	int new_fd = accept(sd, (struct sockaddr *)&their_addr, &sin_size);
 		printf("TCP: connected! %d\n", new_fd);
-		int connected = 1;
+		connected = 1;
 
 		while(connected) { 
 			size_t queuesize = 0;
@@ -187,8 +188,10 @@ int main(void)
 
 	//printf("listener: packet contains \"%s\"\n", newpkt.c_str());
 	pthread_mutex_lock (&mylock);
-		pktqueue.push_back(newpkt);
-		queuelen = (int)pktqueue.size();
+		if (connected) {
+			pktqueue.push_back(newpkt);
+			queuelen = (int)pktqueue.size();
+		}
 	pthread_mutex_unlock (&mylock);
 
 	if (queuelen > 1)
