@@ -60,12 +60,12 @@ void *TCPserver(void *arg)                    /* servlet thread */
 	addr.sin_port = htons(TCPPORT);
 	addr.sin_addr.s_addr = INADDR_ANY;
 
-	if (ret = bind(sd, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+	if ((ret = bind(sd, (struct sockaddr *)&addr, sizeof(addr))) != 0) {
 		fprintf(stderr, "TCP: ERR bind %d\n", ret);
 		err = 1;
 	}
 
-	if (ret = listen(sd, 10) != 0) {
+	if ((ret = listen(sd, 10)) != 0) {
 		fprintf(stderr,"TCP: ERR listen %d", ret);
 		err = 1;
 	}
@@ -89,8 +89,8 @@ void *TCPserver(void *arg)                    /* servlet thread */
 			/* extract from the queue and send it to the TCP client */
 			while (queuesize > 0 && connected) {
 				pthread_mutex_lock (&mylock);
-				for (int z=0; z<pktqueue.size() && connected; z++) {
-					if (ret = send(new_fd, &(pktqueue[z][0]), pktqueue[z].size(), 0) < 0) {
+				for (uint32_t z=0; z<pktqueue.size() && connected; z++) {
+					if ((ret = send(new_fd, &(pktqueue[z][0]), pktqueue[z].size(), 0)) < 0) {
 						if (errno == 32) {
 							fprintf(stderr, "TCP: client disconnected\n");
 						} else {
@@ -100,7 +100,7 @@ void *TCPserver(void *arg)                    /* servlet thread */
 						errno = 0;
 					}
 				}
-				for (int z=0; z<pktqueue.size() && connected; z++) {
+				for (uint32_t z=0; z<pktqueue.size() && connected; z++) {
 					pktqueue.pop_back();
 					queuesize--;
 				}
@@ -112,6 +112,7 @@ void *TCPserver(void *arg)                    /* servlet thread */
 
 	printf("SERVER CLOSE\n");
 
+	return(0);
 }
 
 int main(void)
