@@ -190,7 +190,10 @@ int main(void)
 	//printf("listener: packet contains \"%s\"\n", newpkt.c_str());
 	pthread_mutex_lock (&mylock);
 		if (connected) {
-			pktqueue.push_back(newpkt);
+			queuelen = (int)pktqueue.size();
+            if (queuelen < 3) {
+                pktqueue.push_back(newpkt);
+            }
 			queuelen = (int)pktqueue.size();
 		}
 	pthread_mutex_unlock (&mylock);
